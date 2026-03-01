@@ -3,9 +3,9 @@
 **Tagline:** The AI teammate that sits beside you and gets real work done.
 
 **Backstory:**
-Sidekick started from a simple frustration: most AI tools chat well, but break your flow when work gets messy across tabs, tools, and follow-ups.
-We built Sidekick as a true second seat at your desk: it remembers context, runs actions, and helps you finish tasks end-to-end.
-It is the modern operator for builders who want speed without losing control.
+Every superhero has a sidekick, and builders are no different. You are the hero driving the mission; Sidekick handles the ground game.
+It can see your local project folders, make code and file changes, run commands, and help execute tasks end-to-end instead of just chatting.
+When the work gets chaotic across tools and tabs, Sidekick stays in your corner so you can move faster without losing control.
 
 Full-stack AI workspace built with React + Express + GitHub Copilot SDK.
 
