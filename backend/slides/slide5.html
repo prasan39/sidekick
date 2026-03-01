@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+html { background: #ffffff; }
+body {
+  width: 720pt; height: 405pt; margin: 0; padding: 0;
+  background: #FFFFFF; font-family: Arial, sans-serif;
+  display: flex; flex-direction: column;
+}
+.header { 
+  background: #181B24; padding: 25pt 40pt;
+  border-left: 8pt solid #B165FB;
+}
+h1 { color: #FFFFFF; font-size: 32pt; margin: 0; font-weight: bold; }
+.content { 
+  padding: 30pt 40pt; flex: 1;
+  display: flex; gap: 30pt;
+}
+.text { flex: 1; }
+.intro { 
+  color: #181B24; font-size: 16pt; line-height: 1.6;
+  margin: 0 0 20pt 0;
+}
+ul { 
+  list-style: none; padding: 0; margin: 0;
+  color: #181B24; font-size: 14pt; line-height: 1.8;
+}
+li { 
+  margin: 10pt 0; padding-left: 25pt;
+  position: relative;
+}
+li:before {
+  content: "•"; position: absolute; left: 0; color: #40695B;
+  font-size: 20pt;
+}
+.chart-area { 
+  flex: 1; background: #F8F8F8; 
+  border: 2pt solid #E0E0E0; border-radius: 8pt;
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Enterprise AI Adoption</h1>
+</div>
+<div class="content">
+  <div class="text">
+    <p class="intro">Organizations accelerated AI integration across core business functions</p>
+    <ul>
+      <li>AI-powered customer service with 90%+ resolution rates</li>
+      <li>Predictive analytics driving strategic decisions</li>
+      <li>Custom models trained on proprietary data</li>
+      <li>AI-assisted software development tools</li>
+      <li>Operational efficiency gains of 30-40%</li>
+    </ul>
+  </div>
+  <div id="chart2" class="chart-area placeholder" style="width: 280pt; height: 245pt;"></div>
+</div>
+</body>
+</html>

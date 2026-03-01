@@ -1,0 +1,35 @@
+{
+  "name": "Work Assistant",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+
+  "forwardPorts": [5173, 3001],
+  "portsAttributes": {
+    "5173": {
+      "label": "Work Assistant (Frontend)",
+      "onAutoForward": "openBrowserOnce"
+    },
+    "3001": {
+      "label": "Backend API",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": "npm run install:all",
+  "postStartCommand": "nohup npm run dev > /tmp/dev.log 2>&1 &",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    },
+    "codespaces": {
+      "openFiles": ["README.md"]
+    }
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  }
+}

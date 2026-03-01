@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Data files (keep structure, ignore user data)
+backend/data/*.jsonl
+backend/data/*.json
+backend/data/*.sqlite
+backend/data/*.sqlite-wal
+backend/data/*.sqlite-shm
+
+# Sandbox builds
+backend/sandbox/
+
+# Repo-level sandbox + test artifacts
+sandbox/
+test-results/
+
+# Temporary files
+*.tmp
+*.temp
