@@ -41,7 +41,10 @@ function AuthenticatedApp() {
             <span className="logo-icon">
               <Sparkles size={18} />
             </span>
-            <span className="logo-text">CoWork Terminal</span>
+            <span className="logo-copy">
+              <span className="logo-text">Sidekick</span>
+              <span className="logo-tagline">SidekickNova • Your AI sidekick</span>
+            </span>
           </div>
           <div className={`connection-status ${chatState.isConnected ? 'connected' : 'disconnected'}`}>
             <span className="status-dot"></span>

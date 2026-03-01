@@ -2,6 +2,8 @@ export const WORKIQ_ENABLED = process.env.WORKIQ_ENABLED === 'true';
 export const SUBSTACK_ENABLED = process.env.SUBSTACK_DIGEST_ENABLED === 'true';
 export const GMAIL_ENABLED = !!(process.env.GMAIL_CLIENT_ID && process.env.GMAIL_CLIENT_SECRET);
 export const FINANCE_ENABLED = process.env.FINANCE_ENABLED !== 'false';
+export const VERCEL_DEPLOY_ENABLED = process.env.VERCEL_DEPLOY_ENABLED !== 'false';
+export const SIDEKICK_NAME = (process.env.SIDEKICK_NAME || 'Sidekick Nova').trim();
 
 function parseExtraArgs(raw: string | undefined): string[] {
   const value = (raw || '').trim();
@@ -41,13 +43,6 @@ export const PLAYWRIGHT_MCP_ENABLED = process.env.PLAYWRIGHT_MCP_ENABLED === 'tr
 // Playwright MCP runs headed by default; for backend/server usage we default to headless unless explicitly disabled.
 export const PLAYWRIGHT_MCP_HEADLESS = process.env.PLAYWRIGHT_MCP_HEADLESS !== 'false';
 export const PLAYWRIGHT_MCP_EXTRA_ARGS = parseExtraArgs(process.env.PLAYWRIGHT_MCP_EXTRA_ARGS);
-// Web search behavior when Playwright MCP is enabled:
-// - direct: use search engines/news sites directly
-// - chatgpt: open chatgpt.com and ask it to web search (requires active login in that browser session)
-export const PLAYWRIGHT_WEB_SEARCH_MODE =
-  (process.env.PLAYWRIGHT_WEB_SEARCH_MODE || 'chatgpt').toLowerCase() === 'chatgpt'
-    ? 'chatgpt'
-    : 'direct';
 
 // Optional model override for live-news/browser-heavy requests.
 // Example: LIVE_NEWS_MODEL=gpt-5.1

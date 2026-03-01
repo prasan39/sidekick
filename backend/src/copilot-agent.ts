@@ -14,10 +14,11 @@ import {
   SUBSTACK_ENABLED,
   GMAIL_ENABLED,
   FINANCE_ENABLED,
+  VERCEL_DEPLOY_ENABLED,
+  SIDEKICK_NAME,
   PLAYWRIGHT_MCP_ENABLED,
   PLAYWRIGHT_MCP_HEADLESS,
   PLAYWRIGHT_MCP_EXTRA_ARGS,
-  PLAYWRIGHT_WEB_SEARCH_MODE,
   LIVE_NEWS_MODEL,
 } from './config.js';
 import { digestStore } from './substack/index.js';
@@ -28,6 +29,11 @@ const COPILOT_SEND_AND_WAIT_TIMEOUT_MS =
 
 const LIVE_WEB_QUERY_PATTERN = /\b(live|latest|today|breaking|news|current update|right now)\b/i;
 const LIVE_WEB_BLOCKED_TOOLS = new Set(['web_fetch', 'task']);
+const GREETING_QUERY_PATTERN = /^\s*(hi|hello|hey|yo|good (morning|afternoon|evening))\b/i;
+const IDENTITY_QUERY_PATTERN = /\b(who are you|what are you|introduce yourself|your name)\b/i;
+const ACTION_QUERY_PATTERN = /\b(build|fix|implement|add|remove|create|deploy|run|debug|update|refactor|generate|write|ship)\b/i;
+const EXPLANATION_QUERY_PATTERN = /\b(why|how|explain|difference|compare|pros|cons|tradeoff|when should|what is)\b/i;
+const OPTIONS_QUERY_PATTERN = /\b(list|top|ideas|options|recommend|suggest|plan|roadmap|prioritize)\b/i;
 
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   let timeoutId: NodeJS.Timeout | undefined;
@@ -212,6 +218,18 @@ export class CopilotAgent {
   private buildSystemPrompt(): string {
     const { memory, recentConversation } = this.memoryManager!.getFullContext();
 
+    const personaIntro = `You are ${SIDEKICK_NAME}, the user's personal pulsar-inspired AI sidekick for builders.
+Persona:
+- Pulsar energy: fast, agile, precise, and always moving work forward
+- Sharp, upbeat, and playful comic flavor, but never childish
+- Action-first: help users ship outcomes, not just ideas
+- Use occasional short sidekick-style lines, but keep answers clear and structured
+- Never let persona reduce factual accuracy or safety
+Identity guardrails:
+- Your identity is ${SIDEKICK_NAME}
+- Do NOT present yourself as GitHub Copilot CLI, an SDK, or a generic terminal assistant
+- Do NOT reveal model IDs or provider internals unless the user explicitly asks for system details`;
+
     const workIqIntro = WORKIQ_ENABLED
       ? 'You are a helpful work assistant with access to the user\'s Microsoft 365 data through Work IQ.'
       : 'You are a helpful work assistant focused on local files, reasoning, and app building.';
@@ -255,23 +273,33 @@ Use for: current events, latest prices/specs, or anything requiring fresh web lo
 - When Playwright MCP is enabled, prefer Playwright over generic web_fetch for live/news requests.
 - Open and read primary sources (official docs/sites) when possible.
 - Return concise results and include source links.
-- Browser mode: ${PLAYWRIGHT_WEB_SEARCH_MODE === 'chatgpt'
-        ? 'Open chatgpt.com and ask for web search first; only fall back to direct/source-site browsing if ChatGPT is unavailable or not signed in.'
-        : 'Use direct web search (search engine + primary sources).'}
+- Browser mode: Use direct source-site browsing/search in Playwright.
 ` : `
 ### 3. Browser automation
 Playwright MCP is disabled. Do not claim to have browsed the web in this mode.
 `;
 
     const browserCapabilities = PLAYWRIGHT_MCP_ENABLED
-      ? `- **Web search and browsing** (Playwright MCP): enabled (${PLAYWRIGHT_WEB_SEARCH_MODE} mode)`
+      ? '- **Web search and browsing** (Playwright MCP): enabled (direct mode)'
       : '- Web browsing is disabled unless PLAYWRIGHT_MCP_ENABLED=true';
+    const vercelCapabilities = VERCEL_DEPLOY_ENABLED
+      ? '- **Vercel preview deploys**: for "deploy/share/go live/preview URL" requests, deploy with `bash skills/vercel-deploy/scripts/deploy.sh <project-path>` and return both Preview URL and Claim URL'
+      : '- Vercel preview deploy skill is disabled';
+    const artifactSkillsRouting = `
+### 4. Artifact Skills Routing
+Use local skills under backend/skills when relevant:
+- **theme-factory**: when user asks to restyle, re-theme, improve aesthetics, color palette, font pairing, or visual vibe of an artifact/deck/page.
+- **web-artifacts-builder**: when user asks to build advanced web artifacts/prototypes with multiple components, React/Tailwind/shadcn, stateful UI, or bundled single-file deliverables.
+- If a request clearly matches one of these, invoke that skill workflow first before ad-hoc coding.
+`;
 
     const routingHeader = WORKIQ_ENABLED
       ? 'You have TWO separate systems. Pick the RIGHT one every time:'
       : 'You have ONE local system. Do not use Work IQ:';
 
-    return `${workIqIntro}
+    return `${personaIntro}
+
+${workIqIntro}
 
 ## Your Memory
 You have persistent memory that survives across sessions. Here's what you remember:
@@ -331,6 +359,9 @@ ${recentConversation.length > 0
 - Avoid cramped formatting - add whitespace between sections
 - Use headers (##, ###) to organize longer responses
 - For action items, use checkboxes: - [ ] Item
+- Never return a single large paragraph for informational answers; use section headers + bullet points.
+- Keep paragraph blocks to 2-3 sentences max, then switch to bullets.
+- For source-backed answers, include a Sources section with markdown links.
 
 ## Tool Routing — FOLLOW THIS STRICTLY
 
@@ -346,6 +377,7 @@ Use for: local files, folders, system commands, installed apps
 - Running scripts, installing software, system info
 ${workIqRouting}
 ${browserRouting}
+${artifactSkillsRouting}
 
 ## Other Capabilities
 - Remember and recall information (memory tools)
@@ -353,6 +385,7 @@ ${browserRouting}
 ${financeCapabilities}
 ${workIqCapabilities}
 ${browserCapabilities}
+${vercelCapabilities}
 ${GMAIL_ENABLED ? `
 ### Gmail (read_gmail tool)
 - "Show my latest emails" → read_gmail
@@ -797,7 +830,7 @@ ${GMAIL_ENABLED ? `
           return {
             permissionDecision: 'deny',
             permissionDecisionReason: 'Live web policy: web_fetch is blocked; use Playwright MCP browser tools.',
-            additionalContext: 'For this request, use Playwright MCP browser tools (chatgpt.com flow first when configured) instead of web_fetch.',
+            additionalContext: 'For this request, use Playwright MCP browser tools with direct source-site browsing instead of web_fetch.',
           };
         },
       },
@@ -841,7 +874,7 @@ ${GMAIL_ENABLED ? `
           name: 'pptx-agent',
           displayName: 'Presentation Creator',
           description: 'Specialized sub-agent for creating PowerPoint presentations and slide decks. Invoked when the user asks for a presentation, slides, or deck.',
-          prompt: `You are a specialized PowerPoint presentation creator for CoWork Terminal.
+          prompt: `You are a specialized PowerPoint presentation creator for Sidekick.
 Your only job is to create well-structured, professional slide decks using the create_presentation tool.
 
 Guidelines:
@@ -875,11 +908,25 @@ Rules:
 Rules:
 - For live/latest/breaking/current events, retrieve data with Playwright MCP browser tools.
 - NEVER use web_fetch or task for live-news retrieval.
-- Browser mode: ${PLAYWRIGHT_WEB_SEARCH_MODE === 'chatgpt'
-              ? 'Open chatgpt.com in Playwright and use ChatGPT web search first; if unavailable, fall back to direct authoritative source browsing in Playwright.'
-              : 'Use direct authoritative source browsing/search in Playwright.'}
+- Browser mode: Use direct authoritative source browsing/search in Playwright.
 - Prefer primary/authoritative news sources and include source URLs.
 - Keep output factual and concise, include exact timestamps when available.`,
+          tools: null,
+          infer: true,
+        }] : []),
+        ...(VERCEL_DEPLOY_ENABLED ? [{
+          name: 'vercel-deploy-agent',
+          displayName: 'Vercel Preview Deployer',
+          description: 'Specialized sub-agent for creating Vercel preview deployments and returning shareable URLs.',
+          prompt: `You are a Vercel deployment specialist for local/sandbox projects.
+Rules:
+- Use shell commands to deploy with: bash skills/vercel-deploy/scripts/deploy.sh <project-path>
+- If no path is provided, prefer the latest app under ./sandbox, otherwise ask for the target path.
+- If deployment is requested "after build", ensure the target project has been built or is build-ready first.
+- Always return BOTH:
+  1) Preview URL (live link)
+  2) Claim URL (to transfer to user's Vercel account)
+- Keep responses concise and actionable.`,
           tools: null,
           infer: true,
         }] : []),
@@ -1054,13 +1101,96 @@ Rules:
     if (!PLAYWRIGHT_MCP_ENABLED) return message;
     if (!LIVE_WEB_QUERY_PATTERN.test(message)) return message;
 
-    const modeInstruction = PLAYWRIGHT_WEB_SEARCH_MODE === 'chatgpt'
-      ? 'Open chatgpt.com in Playwright and use ChatGPT web search first. If ChatGPT is unavailable, fall back to direct source-site browsing in Playwright.'
-      : 'Use direct source-site browsing/search in Playwright.';
-
     return `${message}
 
-[Execution policy: This is a live web query. You MUST use Playwright MCP browser automation for retrieval and MUST NOT use generic web_fetch for this request. ${modeInstruction}]`;
+[Execution policy: This is a live web query. You MUST use Playwright MCP browser automation for retrieval and MUST NOT use generic web_fetch for this request. Use direct source-site browsing/search in Playwright.]`;
+  }
+
+  private buildResponseStructurePolicy(message: string): string {
+    if (IDENTITY_QUERY_PATTERN.test(message)) {
+      return `Use this structure:
+## Who I Am
+- Introduce yourself as ${SIDEKICK_NAME}
+- Do not mention SDK/internal model details unless explicitly asked
+
+## How I Help
+- 2-4 bullets`;
+    }
+
+    if (GREETING_QUERY_PATTERN.test(message)) {
+      return `Keep response short and clean:
+- 1-2 lines max using the ${SIDEKICK_NAME} persona
+- Optional single bullet for next useful action`;
+    }
+
+    if (LIVE_WEB_QUERY_PATTERN.test(message)) {
+      return `Use this exact structure:
+## TL;DR
+- 1-2 bullets
+
+## Key Updates
+- Bullet points only (no dense paragraphs)
+
+## Why It Matters
+- 2-4 bullets
+
+## Sources
+| Source | Date | Link |
+| --- | --- | --- |`;
+    }
+
+    if (ACTION_QUERY_PATTERN.test(message)) {
+      return `Use this structure:
+## Objective
+- One bullet
+
+## Plan
+- Numbered steps
+
+## Progress / Output
+- Bullet points with concrete status
+
+## Next Step
+- One clear next action`;
+    }
+
+    if (EXPLANATION_QUERY_PATTERN.test(message)) {
+      return `Use this structure:
+## Short Answer
+- 1-2 bullets
+
+## Key Reasons
+- 3-6 bullets
+
+## Practical Example
+- One concise example`;
+    }
+
+    if (OPTIONS_QUERY_PATTERN.test(message)) {
+      return `Use this structure:
+## Options
+- Numbered list with one-line tradeoff each
+
+## Recommendation
+- One clear recommended option and why`;
+    }
+
+    return `Use this structure:
+## Answer
+- Direct answer in 1-2 bullets
+
+## Key Points
+- 3-6 bullets
+
+## Next
+- One suggested follow-up action`;
+  }
+
+  private applyResponseStructurePolicy(message: string): string {
+    const structurePolicy = this.buildResponseStructurePolicy(message);
+    return `${message}
+
+[Response format policy: ${structurePolicy}]`;
   }
 
   private shouldEnforceLiveWebPolicy(message: string): boolean {
@@ -1134,7 +1264,7 @@ Rules:
 
       // Build the request payload
       const sendPayload: { prompt: string; attachments?: FileAttachment[] } = {
-        prompt: this.applyLiveWebPolicy(message),
+        prompt: this.applyLiveWebPolicy(this.applyResponseStructurePolicy(message)),
       };
       if (attachments && attachments.length > 0) {
         sendPayload.attachments = attachments;
@@ -1201,7 +1331,7 @@ Rules:
       await this.selectLiveNewsAgentIfNeeded(enforceLiveWeb);
       previousModelId = await this.switchToLiveNewsModelIfNeeded(enforceLiveWeb);
       await this.session!.send({
-        prompt: this.applyLiveWebPolicy(message),
+        prompt: this.applyLiveWebPolicy(this.applyResponseStructurePolicy(message)),
       });
     } catch (error) {
       if (enforceLiveWeb) {

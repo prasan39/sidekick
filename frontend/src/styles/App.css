@@ -263,6 +263,13 @@ body {
   gap: 10px;
 }
 
+.logo-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
 .logo-icon,
 .login-logo-icon {
   width: 34px;
@@ -279,10 +286,19 @@ body {
 
 .logo-text {
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 1.86rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-primary);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.logo-tagline {
+  color: var(--text-muted);
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -514,8 +530,16 @@ body {
 .message-content {
   color: var(--text-primary);
   font-size: 0.99rem;
-  line-height: 1.56;
+  line-height: 1.68;
   word-break: break-word;
+}
+
+.message-content > :first-child {
+  margin-top: 0;
+}
+
+.message-content > :last-child {
+  margin-bottom: 0;
 }
 
 .message-content p,
@@ -524,7 +548,28 @@ body {
 .message-content blockquote,
 .message-content pre,
 .message-content table {
-  margin: 0.55rem 0;
+  margin: 0.72rem 0;
+}
+
+.message-content p {
+  max-width: 72ch;
+}
+
+.message-content p + p {
+  margin-top: 0.85rem;
+}
+
+.message-content ul,
+.message-content ol {
+  padding-left: 1.2rem;
+}
+
+.message-content li {
+  margin: 0.28rem 0;
+}
+
+.message-content li + li {
+  margin-top: 0.38rem;
 }
 
 .message-content h1,
@@ -533,13 +578,19 @@ body {
 .message-content h4 {
   font-family: var(--font-display);
   letter-spacing: 0.04em;
-  margin: 0.72rem 0 0.45rem;
+  margin: 0.9rem 0 0.5rem;
 }
 
 .message-content h1 { font-size: 1.85rem; }
 .message-content h2 { font-size: 1.5rem; }
 .message-content h3 { font-size: 1.25rem; }
 .message-content h4 { font-size: 1.05rem; }
+
+.message-content h2,
+.message-content h3 {
+  padding-bottom: 0.18rem;
+  border-bottom: 1px dashed var(--border-soft);
+}
 
 .message-content a {
   color: var(--accent-warning);
@@ -586,7 +637,7 @@ body {
 .table-wrapper td {
   border-bottom: 1px solid var(--border-soft);
   text-align: left;
-  font-size: 0.83rem;
+  font-size: 0.89rem;
   padding: 7px 9px;
 }
 
@@ -1630,7 +1681,7 @@ body {
 
 [data-theme="light"] .message-content {
   font-size: 1.04rem;
-  line-height: 1.62;
+  line-height: 1.72;
 }
 
 [data-theme="light"] .message-bubble,
@@ -2070,6 +2121,10 @@ body {
 @media (max-width: 640px) {
   .logo-text {
     font-size: 1.5rem;
+  }
+
+  .logo-tagline {
+    display: none;
   }
 
   .user-menu-name {

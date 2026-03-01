@@ -19,11 +19,11 @@ export function LoginScreen() {
           <span className="login-logo-icon">
             <Sparkles size={32} />
           </span>
-          <h1>CoWork Terminal</h1>
+          <h1>Sidekick Terminal</h1>
         </div>
         <p className="login-description">
-          Boot into your AI workstation. Run chats, triage comms, monitor
-          tasks, and ship projects from one command console.
+          Boot into your AI workstation with SidekickNova: your fast, agile,
+          comic sidekick for shipping work at light-speed.
         </p>
         <button className="login-btn" onClick={login}>
           <svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor">

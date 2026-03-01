@@ -289,8 +289,8 @@ export function Chat({
             <div className="welcome-icon">
               <Sparkles size={28} color="white" />
             </div>
-            <h2>What can I help you ship?</h2>
-            <p>Your AI-powered work companion with persistent memory, file analysis, and app building capabilities.</p>
+            <h2>What mission are we shipping today?</h2>
+            <p>SidekickNova is on deck: fast builds, structured thinking, and action-first execution across your workspace.</p>
             <div className="welcome-grid">
               <button className="welcome-card" onClick={() => onSend("Build me a project tracker app with task statuses, due dates, and a Kanban board view")}>
                 <span className="card-icon"><Wrench size={24} /></span>
