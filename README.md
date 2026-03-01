@@ -1,4 +1,11 @@
-# CoWork Terminal
+# Sidekick
+
+**Tagline:** The AI teammate that sits beside you and gets real work done.
+
+**Backstory:**
+Sidekick started from a simple frustration: most AI tools chat well, but break your flow when work gets messy across tabs, tools, and follow-ups.
+We built Sidekick as a true second seat at your desk: it remembers context, runs actions, and helps you finish tasks end-to-end.
+It is the modern operator for builders who want speed without losing control.
 
 Full-stack AI workspace built with React + Express + GitHub Copilot SDK.
 
@@ -30,8 +37,15 @@ This is the fastest path for forks.
 
 ```bash
 git clone <your-fork-url>
-cd cowork-terminal
+cd sidekick
 npm install
+```
+
+Example (upstream):
+
+```bash
+git clone https://github.com/prasan39/sidekick.git
+cd sidekick
 ```
 
 ### 3. Backend env
