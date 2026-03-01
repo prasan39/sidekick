@@ -56,7 +56,7 @@ async function fetchText(url: string): Promise<string> {
   try {
     const response = await fetch(url, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'cowork-terminal/1.0' },
+      headers: { 'User-Agent': 'sidekick-terminal/1.0' },
     });
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);

@@ -43,7 +43,7 @@ function AuthenticatedApp() {
             </span>
             <span className="logo-copy">
               <span className="logo-text">Sidekick</span>
-              <span className="logo-tagline">SidekickNova • Your AI sidekick</span>
+              <span className="logo-tagline">Your AI sidekick</span>
             </span>
           </div>
           <div className={`connection-status ${chatState.isConnected ? 'connected' : 'disconnected'}`}>
